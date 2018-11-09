@@ -106,6 +106,7 @@ void Inotify::watchFile(fs::path filePath)
                         << ". Path: " << filePath.string();
             throw std::runtime_error(errorStream.str());
         }
+    	std::lock_guard<std::mutex> lock(mDataMutex);
         mDirectorieMap.left.insert({wd, filePath});
     } else {
         throw std::invalid_argument(
@@ -115,17 +116,20 @@ void Inotify::watchFile(fs::path filePath)
 
 void Inotify::ignoreFileOnce(fs::path file)
 {
+	std::lock_guard<std::mutex> lock(mDataMutex);
     mOnceIgnoredDirectories.push_back(file.string());
 }
 
 void Inotify::ignoreFile(fs::path file)
 {
+	std::lock_guard<std::mutex> lock(mDataMutex);
     mIgnoredDirectories.push_back(file.string());
 }
 
 
 void Inotify::unwatchFile(fs::path file)
 {
+	std::lock_guard<std::mutex> lock(mDataMutex);
     removeWatch(mDirectorieMap.right.at(file));
 }
 
@@ -149,6 +153,7 @@ void Inotify::removeWatch(int wd)
 
 fs::path Inotify::wdToPath(int wd)
 {
+	std::lock_guard<std::mutex> lock(mDataMutex);
     return mDirectorieMap.left.at(wd);
 }
 
@@ -214,6 +219,7 @@ boost::optional<FileSystemEvent> Inotify::getNextEvent()
 
             if(event->mask & IN_IGNORED){
                 i += EVENT_SIZE + event->len;
+            	std::lock_guard<std::mutex> lock(mDataMutex);
                 mDirectorieMap.left.erase(event->wd);
                 continue;
             }
@@ -269,6 +275,7 @@ bool Inotify::hasStopped()
 
 bool Inotify::isIgnored(std::string file)
 {
+	std::lock_guard<std::mutex> lock(mDataMutex);
     for (unsigned i = 0; i < mOnceIgnoredDirectories.size(); ++i) {
         size_t pos = file.find(mOnceIgnoredDirectories[i]);
         if (pos != std::string::npos) {

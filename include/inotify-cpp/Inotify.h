@@ -22,6 +22,7 @@
 #include <chrono>
 #include <thread>
 #include <atomic>
+#include <mutex>
 
 #include <inotify-cpp/FileSystemEvent.h>
 
@@ -106,5 +107,7 @@ private:
   int mInotifyFd;
   std::atomic<bool> stopped;
   std::function<void(FileSystemEvent)> mOnEventTimeout;
+  mutable
+  std::mutex mDataMutex;
 };
 }
