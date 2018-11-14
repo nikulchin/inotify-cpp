@@ -1,8 +1,7 @@
 cmake_minimum_required(VERSION 2.8.12)
 project(inotify-cpp)
 
-set(CMAKE_CXX_FLAGS -m32)
-set(CMAKE_CXX_FLAGS -std=c++11)
+set(CMAKE_CXX_FLAGS "-std=c++11 -m32")
 
 
 enable_testing()
