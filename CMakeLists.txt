@@ -1,5 +1,8 @@
-cmake_minimum_required(VERSION 3.2.2)
+cmake_minimum_required(VERSION 2.8.12)
 project(inotify-cpp)
+
+set(CMAKE_CXX_FLAGS "-std=c++11 -m32")
+
 
 enable_testing()
 
@@ -14,7 +17,7 @@ set(
 # Boost
 ###############################################################################
 find_package(
-  Boost 1.54.0
+  Boost 1.53.0
   COMPONENTS system filesystem unit_test_framework
   REQUIRED
 )
